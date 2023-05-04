@@ -1,0 +1,184 @@
+<html>
+  <head>
+    <title>Crabada photo example</title>
+    <script src="https://unpkg.com/merge-images"></script>
+    <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.0/bignumber.min.js'></script>
+    <script src='./crabada-dna-helper.js'></script>
+    <script src='./index.js'></script>
+    <style>
+      .detail table, th, td {
+        border: 1px solid;
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Click to the below buttons to generate crabada image</h3>
+    <input type="button" id="btn-1" value="487649789878834074964990110205047357849479679478148937912917025970012828783">Mixed</input> <br/>
+    <input type="button" id="btn-2" value="591921373686145912665554401772333719744823998868146039095175274365481534018">Legend 1 part</input> <br/>
+    <input type="button" id="btn-3" value="466447732941280137889651454250871775001146729114468088945124592670642957163">Legend 2 parts</input> <br/>
+    <input type="button" id="btn-3-1" value="572493092519663811357124537355098103512923138730700319200344348404962444098">Legend 2 parts</input> <br/>
+    <input type="button" id="btn-4" value="1097212027227376668671227747961361930804266087559455166692700661478811594093">Pure 6/6 Genesis</input> <br/>
+    <input type="button" id="btn-random" value="Random"></input> <br/>
+    
+    <pre id="pre-crab-dna">466447732941280137889651454250871775001146729114468088945124592670642957163</pre>
+    <pre id="pre-stats"></pre>
+    <img id="crab-photo" />
+    <table id="tbl-overview">
+                     
+    </table>
+    <table class="detail">
+        <th></th>
+        <th>Shell</th>
+        <th>Horn</th>
+        <th>Body</th>
+        <th>Eyes</th>
+        <th>Mouth</th>
+        <th>Pincer</th>
+        <tbody id="tbl-body">
+
+        </tbody>
+        
+    </table>
+
+    <hr/>
+    <h3>Class and color</h3>
+    <table>
+      <th>Class</th>
+      <th>Color</th>
+      <tbody id="tbl-class-color">
+
+      </tbody>
+    </table>
+    <hr/>
+    <h3>Factions</h3>
+    <table>
+      <th>Faction</th>
+      <th>Classes</th>
+      <tbody id="tbl-faction-class">
+
+      </tbody>
+    </table>
+
+    <hr/>
+    <h3>Crab part id</h3>
+    <table>
+      <th>Id</th>
+      <th>Breed type</th>
+      <th>Faction</th>
+      <th>Class</th>
+      <th>Role</th>
+      <tbody id="tbl-crab-name">
+
+      </tbody>
+
+    </table>
+ 
+  <script>
+
+    function showRandomDNA() {
+      var rDNA = generateRandomDNA();
+      displayPhoto(rDNA)
+    }
+
+    function displayPhoto(dna) {
+      var decDNA = BN(dna)
+      var hexDNA = decDNA.toString(16)
+      var dnaInfo = extractDNA(hexDNA);
+      showPhoto(dnaInfo, 'crab-photo');
+
+
+      var detail = showDetail(dnaInfo)
+
+      document.getElementById('tbl-body').innerHTML = detail.dnaTable
+      document.getElementById('tbl-overview').innerHTML = detail.overview
+      document.getElementById('pre-crab-dna').innerText='Hex DNA: ' + hexDNA;
+
+      var stats = getStats(hexDNA);
+      document.getElementById('pre-stats').innerText='Stats: ' + `damage:${stats[0]}, critical:${stats[1]},speed:${stats[2]},hp:${stats[3]},armor:${stats[4]}`;
+    }
+
+    document.getElementById("btn-1").onclick=(e)=>{displayPhoto(e.target.value);}
+    document.getElementById("btn-2").onclick=(e)=>{displayPhoto(e.target.value);}
+    document.getElementById("btn-3").onclick=(e)=>{displayPhoto(e.target.value);}
+    document.getElementById("btn-3-1").onclick=(e)=>{displayPhoto(e.target.value);}
+    document.getElementById("btn-4").onclick=(e)=>{displayPhoto(e.target.value);}
+    document.getElementById("btn-random").onclick=(e)=>{showRandomDNA();}
+
+
+    // display color & code
+    var colorTable = document.getElementById("tbl-class-color")
+    var innerHTML = '';
+
+    for(var k in BG_COLOR) {
+      var tr = `<tr>
+        <td>${k}</td>
+        <td style="background-color:${BG_COLOR[k]};">${BG_COLOR[k]}</td>
+        </tr>`
+        innerHTML += tr;
+    }
+    colorTable.innerHTML = innerHTML;
+
+    // Display all crabs classes info
+    innerHTML = '';
+    for(var k in CRAB_INFO) {
+      var tr = `<tr>
+        <td>${k}</td>
+        <td>${CRAB_INFO[k][0]}</td>
+        <td>${CRAB_INFO[k][1]}<image style="height:32px;" src="./images/faction-icons/icon_faction_${CRAB_INFO[k][1].toLowerCase()}.svg"/></td>
+        <td>${CRAB_INFO[k][2]} <image style="height:32px;" src="./images/class-icons/${CRAB_INFO[k][2].toLowerCase()}.png"/></td>
+        <td>${CRAB_INFO[k][3]}</td>
+        <td><input type="button" onclick="generatePureCrabImageFromId(${k}, 'crab-photo-${k}')" value="Check image"> <img style="height:100px;" id="crab-photo-${k}" /></td>
+      </tr>`;
+      innerHTML += tr;
+    }
+
+    document.getElementById("tbl-crab-name").innerHTML = innerHTML;
+
+    // Display factions
+    innerHTML = '';
+    for(var k in FACTIONS_AND_CLASSES) {
+      // var classes = FACTIONS_AND_CLASSES[k].join(',')
+      var classes = ''
+      for(var j = 0; j < FACTIONS_AND_CLASSES[k].length; j++) {
+        var c = `${FACTIONS_AND_CLASSES[k][j]}
+        <image style="height:32px;" src="./images/class-icons/${FACTIONS_AND_CLASSES[k][j].toLowerCase()}.png"/>
+        `;
+        classes += c;
+        if(j < FACTIONS_AND_CLASSES[k].length-1) {
+          classes +=', '
+        }
+      }
+      var tr = `<tr>
+        <td>${k}<image style="height:32px;" src="./images/faction-icons/icon_faction_${k.toLowerCase()}.svg"/></td>
+        <td>${classes}</td>
+        
+      </tr>`;
+      innerHTML += tr;
+    }
+
+    document.getElementById("tbl-faction-class").innerHTML = innerHTML;
+
+
+    function generatePureCrabImageFromId(id, targetElementId) {
+      var idHex = toNibble(id);
+      var legendDNA = '000000000000';
+      var reserveDNA = '000000000000';
+      var partDNA=idHex.repeat(18);
+
+      // legend
+      if(id > 1000) {
+        partDNA = '01'.repeat(18);
+        legendDNA = id.toString().slice(-2).repeat(6);
+      }
+      
+      var hexDNA = '0x0201' + legendDNA + reserveDNA + partDNA;
+
+      showPhotoByDNA(hexDNA, targetElementId);
+    }
+
+    showRandomDNA();
+
+    </script>
+  </body>
+</html>
