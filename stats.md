@@ -1,6 +1,5 @@
 ## Base stats
-There are 8 classes in total. A Crabada's base attributes are determined by it's class. 
-
+There are 8 classes in total. A Crabada's base stats are determined by its class.
 
 |Class|HP|ATTACK|ARMOR|SPEED|CRITICAL|
 |--|--|--|--|--|--|

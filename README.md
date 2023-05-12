@@ -2,9 +2,11 @@
 All traits of a crab are determined by its DNA (Alleles/Genes). This document explains how can we get all traits of a crab from its DNA.
 
 - How to generate [image](./image.md)
-- How to get [Breeding type](./breedingtype.md) and [Stats]('./stats.md)
+- How to get [Breeding type](./breedingtype.md) and [Stats](./stats.md)
 
-## DNA structure
+**Example page:** [https://crabada.github.io/](https://crabada.github.io/)
+
+### DNA structure
 - DNA is a 32bytes number
 - Split the DNA to 32 parts, the below table is meaning of all parts:
 
