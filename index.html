@@ -3,6 +3,7 @@
     <title>Crabada photo example</title>
     <script src="https://unpkg.com/merge-images"></script>
     <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.0/bignumber.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.34/dist/web3.min.js'></script>
     <script src='./crabada-dna-helper.js'></script>
     <script src='./index.js'></script>
     <style>
@@ -20,6 +21,13 @@
     <input type="button" id="btn-3-1" value="572493092519663811357124537355098103512923138730700319200344348404962444098">Legend 2 parts</input> <br/>
     <input type="button" id="btn-4" value="1097212027227376668671227747961361930804266087559455166692700661478811594093">Pure 6/6 Genesis</input> <br/>
     <input type="button" id="btn-random" value="Random"></input> <br/>
+    <hr>
+    Crabada NFT contract address: <a href="https://snowtrace.io/address/0xCB7569a6Fe3843c32512d4F3AB35eAE65bd1D50c">0xCB7569a6Fe3843c32512d4F3AB35eAE65bd1D50c</a><br/>
+    <input type="button" id="btn-real-crab" value="Get crab from contract"></input>
+    <input type="input" id="txt-real-crab-id" placeholder="crab's id" ></input>
+    <hr>
+    
+    <br/>
     
     <pre id="pre-crab-dna">466447732941280137889651454250871775001146729114468088945124592670642957163</pre>
     <pre id="pre-stats"></pre>
@@ -75,10 +83,40 @@
     </table>
  
   <script>
+    var crabadaContract;
+    var contractAddress = '0xCB7569a6Fe3843c32512d4F3AB35eAE65bd1D50c'
 
     function showRandomDNA() {
       var rDNA = generateRandomDNA();
       displayPhoto(rDNA)
+    }
+
+    async function showRealCrab() {
+      if (!crabadaContract) {
+        try {
+          var rpc = 'https://api.avax.network/ext/bc/C/rpc';
+          var web3js = new Web3(rpc);
+          var abi = [{"inputs":[{"internalType":"uint256","name":"tokenId","type":"uint256"}],"name":"getCrabInfo","outputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"uint256","name":"daddyId","type":"uint256"},{"internalType":"uint256","name":"mommyId","type":"uint256"},{"internalType":"uint256","name":"dna","type":"uint256"},{"internalType":"uint64","name":"birthday","type":"uint64"},{"internalType":"uint8","name":"breedingCount","type":"uint8"}],"stateMutability":"view","type":"function"}]
+          crabadaContract = new web3js.eth.Contract(abi, contractAddress);
+        } catch(err) {
+          alert(err);
+          return
+        }
+      }
+
+      var crabId = document.getElementById('txt-real-crab-id').value
+      
+      try {
+        crabInfo = await crabadaContract.methods.getCrabInfo(crabId).call();
+        if (crabInfo && crabInfo.dna) {
+          displayPhoto(crabInfo.dna)
+        } else {
+          alert("Can not get crab's information")
+        }
+
+      } catch(err) {
+        alert(err)
+      }
     }
 
     function displayPhoto(dna) {
@@ -104,6 +142,7 @@
     document.getElementById("btn-3-1").onclick=(e)=>{displayPhoto(e.target.value);}
     document.getElementById("btn-4").onclick=(e)=>{displayPhoto(e.target.value);}
     document.getElementById("btn-random").onclick=(e)=>{showRandomDNA();}
+    document.getElementById("btn-real-crab").onclick=(e)=>{showRealCrab()}
 
 
     // display color & code

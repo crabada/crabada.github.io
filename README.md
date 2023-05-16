@@ -1,3 +1,6 @@
+## Crabada legacy contract addresses
+- NFT contract: [0xCB7569a6Fe3843c32512d4F3AB35eAE65bd1D50](https://snowtrace.io/address/0xCB7569a6Fe3843c32512d4F3AB35eAE65bd1D50c)
+
 ## Crabada NFT traits
 All traits of a crab are determined by its DNA (Alleles/Genes). This document explains how can we get all traits of a crab from its DNA.
 
